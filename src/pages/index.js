@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { Inter } from "next/font/google";
 import { fetchAbi } from "../utils/fetch";
 import { getCount, increment, decrement } from "../utils/contractFunctions";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getPublicProviderUrl } from "@therootnetwork/api";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -92,10 +92,14 @@ export default function Home() {
         const wallet = accounts[0];
         setSelectedAddress(wallet);
 
-        const signer = await getSigner(provider, wallet);
-        setSigner(signer);
+        if (provider) {
+          const signer = await getSigner(provider, wallet);
+          setSigner(signer);
+        } else {
+          console.error("Provider not initialized");
+        }
       } catch (error) {
-        console.log("error connecting...");
+        console.log("error connecting: ", error);
       }
     } else {
       console.log("metamask not detected");
@@ -126,11 +130,19 @@ export default function Home() {
     console.log(currentCount);
   };
 
-  const handleIncrement = async () => {
-    console.log("calling contract function `increment()`");
-    const abi = await fetchAbi();
-    await increment(abi, signer);
-  };
+  const handleIncrement = useCallback(async () => {
+    console.log("calling contract function increment()");
+    if (!signer) {
+      console.error("No signer available, please connect wallet");
+      return;
+    }
+    try {
+      const abi = await fetchAbi();
+      await increment(abi, signer);
+    } catch (error) {
+      console.error("Error executing increment: ", error);
+    }
+  }, [signer]);
 
   const handleDecrement = async () => {
     console.log("calling contract function `decrement()`");
@@ -162,7 +174,6 @@ export default function Home() {
           >
             connect wallet
           </button>
-          <div>testing evm code</div>
           <div>testing evm code</div>
           <button
             className="border-[2px] border-[#FFFFFF] p-2 mt-2 rounded-lg"
