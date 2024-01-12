@@ -11,12 +11,15 @@ export const getCount = async (abi, signer) => {
 
 export const increment = async (abi, signer) => {
   console.log(signer);
+  console.log(abi);
   const contractWithSigner = new ethers.Contract(CONTRACT_ADDRESS, abi, signer);
   const tx = await contractWithSigner.increment();
   console.log(tx);
 };
 
 export const decrement = async (abi, signer) => {
+  console.log(signer);
+  console.log(abi);
   const contractWithSigner = new ethers.Contract(CONTRACT_ADDRESS, abi, signer);
   const tx = await contractWithSigner.decrement();
   console.log(tx);
