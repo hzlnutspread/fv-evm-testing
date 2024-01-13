@@ -28,12 +28,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    setProvider(
-      new ethers.providers.JsonRpcProvider(
-        getPublicProviderUrl("porcini", false),
-        7672
-      )
-    );
+    setProvider(new ethers.providers.Web3Provider(window.ethereum));
   }, []);
   // ============================= USE EFFECTS END =============================
 
