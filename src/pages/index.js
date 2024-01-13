@@ -1,7 +1,12 @@
 import { ethers } from "ethers";
 import { Inter } from "next/font/google";
 import { fetchAbi } from "../utils/fetch";
-import { getCount, increment, decrement } from "../utils/contractFunctions";
+import {
+  getCount,
+  incrementCount,
+  decrementCount,
+  transferToken,
+} from "../utils/contractFunctions";
 import { useEffect, useState, useCallback } from "react";
 import { getPublicProviderUrl } from "@therootnetwork/api";
 
@@ -107,7 +112,7 @@ export default function Home() {
   };
 
   const getSigner = async (provider, connectedWallet) => {
-    const signer = provider.getSigner(connectedWallet);
+    const signer = await provider.getSigner(connectedWallet);
     return signer;
   };
 
@@ -138,7 +143,7 @@ export default function Home() {
     }
     try {
       const abi = await fetchAbi();
-      await increment(abi, signer);
+      await incrementCount(abi, signer);
     } catch (error) {
       console.error("Error executing increment: ", error);
     }
@@ -147,7 +152,12 @@ export default function Home() {
   const handleDecrement = async () => {
     console.log("calling contract function `decrement()`");
     const abi = await fetchAbi();
-    await decrement(abi, signer);
+    await decrementCount(abi, signer);
+  };
+
+  const handleTransferToken = async () => {
+    console.log("calling contract function `transfer()`");
+    await transferToken(signer);
   };
 
   return (
@@ -182,6 +192,12 @@ export default function Home() {
             log ABI
           </button>
           <div>
+            <button
+              className="border-[2px] border-[#FFFFFF] p-2 mt-[48px] rounded-lg"
+              onClick={handleTransferToken}
+            >
+              transfer ASTO
+            </button>
             <button
               className="border-[2px] border-[#FFFFFF] p-2 mt-[48px] rounded-lg"
               onClick={handleGetCount}
